@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b0b12"><meta name="description" content="Halloween AI owner dashboard">
+  <title>Halloween AI · Admin</title><link rel="icon" href="assets/app-icon.png"><link rel="stylesheet" href="assets/admin.css">
+</head>
+<body>
+  <div id="authView" class="auth-wrap">
+    <section class="auth-card">
+      <img src="assets/app-icon.png" class="logo" alt="Halloween AI">
+      <p class="eyebrow">HALLOWEEN AI · OWNER CONSOLE</p>
+      <h1>Admin sign in</h1>
+      <p class="muted">Sign in with the authorized Google account. Access is also enforced by Firestore security rules.</p>
+      <button id="googleBtn" class="btn primary wide">Continue with Google</button>
+      <p id="authStatus" class="status-line" role="status">Firebase is initializing…</p>
+      <p class="tiny">Authorized owner: <strong id="ownerEmailLabel">notxpersonalonly@gmail.com</strong></p>
+    </section>
+  </div>
+
+  <div id="appView" class="app hidden">
+    <aside class="sidebar">
+      <div class="brand"><img src="assets/app-icon.png" alt=""><span>HALLOWEEN AI<small>OWNER CONSOLE</small></span></div>
+      <p class="nav-label">WORKSPACE</p>
+      <button class="nav active" data-page="overview">⌂ <span>Overview</span></button>
+      <button class="nav" data-page="users">♙ <span>Users</span></button>
+      <button class="nav" data-page="entitlements">✦ <span>Imagine access</span></button>
+      <button class="nav" data-page="subscriptions">▤ <span>Subscriptions</span></button>
+      <button class="nav" data-page="announcements">◉ <span>Announcements</span></button>
+      <button class="nav" data-page="settings">⚙ <span>App settings</span></button>
+      <div class="side-bottom"><div class="user-dot">A</div><div class="identity"><b>Admin</b><small id="signedInEmail">—</small></div><button id="signOutBtn" class="icon-btn" title="Sign out">↪</button></div>
+    </aside>
+    <main class="main">
+      <header class="topbar"><div><p class="eyebrow">HALLOWEEN AI / FIREBASE ADMIN</p><h1 id="pageTitle">Overview</h1></div><div class="top-right"><span id="connectionState" class="pill">Connecting…</span><a href="https://notxpersonalonly.github.io/halloween-ai/" target="_blank" rel="noopener">Open app ↗</a></div></header>
+      <div id="globalNotice" class="notice">Firebase-connected dashboard. Payment verification is not configured yet; do not use manual access grants as proof of payment.</div>
+
+      <section class="page active" id="page-overview">
+        <div class="hero"><div><p class="eyebrow">OWNER CONTROL CENTER</p><h2>Your app. Your rules.</h2><p>Review users, access records, announcements and app configuration.</p></div><div class="hero-icon">✧</div></div>
+        <div class="stats">
+          <article class="stat"><span>Registered users</span><b id="statUsers">—</b><small>Firebase user profiles</small></article>
+          <article class="stat"><span>Active subscriptions</span><b id="statSubs">—</b><small>Recorded subscription status</small></article>
+          <article class="stat"><span>Imagine access</span><b id="statUnlocked">—</b><small>Active payment or manual access</small></article>
+          <article class="stat"><span>Announcements</span><b id="statAnnouncements">—</b><small>Published messages</small></article>
+        </div>
+        <div class="panel"><div class="panel-head"><div><h3>Security status</h3><p>Current deployment checks</p></div></div><ul class="check-list"><li><span class="check">✓</span> Google Authentication is enabled in Firebase</li><li><span class="check">✓</span> Dashboard checks the approved admin email</li><li><span class="check">✓</span> Firestore rules restrict writes to the admin account</li><li><span class="pending">!</span> Cashfree payment verification is not connected</li><li><span class="pending">!</span> Android app integration is not connected yet</li></ul></div>
+      </section>
+
+      <section class="page" id="page-users">
+        <div class="section-head"><div><h2>Users</h2><p>Profiles created by the Android app after Firebase sign-in.</p></div><button class="btn" id="refreshUsers">Refresh</button></div>
+        <div class="panel table-panel"><div class="panel-head"><div><h3>User accounts</h3><p id="userCount">—</p></div><input id="userSearch" class="search" placeholder="Search email or UID"></div><div class="table-wrap"><table><thead><tr><th>USER</th><th>UID</th><th>CREATED</th><th>LAST SEEN</th></tr></thead><tbody id="userRows"><tr><td colspan="4" class="empty">No user profiles loaded.</td></tr></tbody></table></div></div>
+      </section>
+
+      <section class="page" id="page-entitlements">
+        <div class="section-head"><div><h2>Imagine access</h2><p>Review access records. Manual grants are separate from verified paid subscriptions.</p></div><button class="btn" id="refreshEntitlements">Refresh</button></div>
+        <div class="callout"><b>Important payment boundary</b><p>This dashboard can grant a temporary manual trial. It cannot verify Cashfree payments. Never mark a customer as paid here; payment-based access must come from a trusted payment webhook/backend.</p></div>
+        <div class="panel table-panel"><div class="panel-head"><div><h3>Entitlements</h3><p>Payment status and manual access are shown separately.</p></div><input id="entSearch" class="search" placeholder="Search UID"></div><div class="table-wrap"><table><thead><tr><th>UID</th><th>PAYMENT STATUS</th><th>PAID UNTIL</th><th>MANUAL UNTIL</th><th>ACTION</th></tr></thead><tbody id="entRows"><tr><td colspan="5" class="empty">No entitlement records loaded.</td></tr></tbody></table></div></div>
+      </section>
+
+      <section class="page" id="page-subscriptions">
+        <div class="section-head"><div><h2>Subscriptions</h2><p>Read-only records. Payment verification must be performed by a trusted server.</p></div><button class="btn" id="refreshSubs">Refresh</button></div>
+        <div class="panel table-panel"><div class="panel-head"><div><h3>Subscription records</h3><p id="subCount">—</p></div><input id="subSearch" class="search" placeholder="Search UID or provider ID"></div><div class="table-wrap"><table><thead><tr><th>UID</th><th>STATUS</th><th>PROVIDER</th><th>PERIOD END</th><th>UPDATED</th></tr></thead><tbody id="subRows"><tr><td colspan="5" class="empty">No subscription records loaded.</td></tr></tbody></table></div></div>
+      </section>
+
+      <section class="page" id="page-announcements">
+        <div class="section-head"><div><h2>Announcements</h2><p>Create messages that the app can display to users.</p></div></div>
+        <div class="two-col"><form id="announcementForm" class="panel form"><h3>New announcement</h3><label>Title<input id="announcementTitle" maxlength="90" required></label><label>Message<textarea id="announcementBody" rows="4" maxlength="1000" required></textarea></label><label>Type<select id="announcementType"><option value="info">Information</option><option value="success">Success</option><option value="warning">Warning</option></select></label><label class="inline"><input id="announcementPublished" type="checkbox" checked> Publish immediately</label><button class="btn primary" type="submit">Save announcement</button></form>
+        <div class="panel"><div class="panel-head"><div><h3>Existing announcements</h3><p>Toggle publication or delete a message.</p></div><button class="btn" id="refreshAnnouncements">Refresh</button></div><div id="announcementList" class="announcement-list"><p class="empty">No announcements yet.</p></div></div></div>
+      </section>
+
+      <section class="page" id="page-settings">
+        <div class="section-head"><div><h2>App settings</h2><p>These settings are readable by the app. Keep maintenance controls deliberate.</p></div></div>
+        <form id="settingsForm" class="panel form settings-form"><label>Current app version<input id="appVersion" maxlength="30" placeholder="e.g. 1.0.0"></label><label>Minimum supported version<input id="minVersion" maxlength="30" placeholder="e.g. 1.0.0"></label><label>Update message<textarea id="updateMessage" rows="2" maxlength="500"></textarea></label><label class="inline"><input id="maintenanceMode" type="checkbox"> Maintenance mode</label><label>Maintenance message<textarea id="maintenanceMessage" rows="2" maxlength="500"></textarea></label><button class="btn primary" type="submit">Save app settings</button></form>
+        <div class="panel plan"><div><p class="eyebrow">SINGLE SUBSCRIPTION PRODUCT</p><h3>Imagine Unlock</h3><p>₹110 / month · unlocks the local Imagine feature. This is display information only; billing is not activated by this dashboard.</p></div><span class="pill">Not connected to payments</span></div>
+      </section>
+      <footer>Halloween AI Admin · GitHub Pages + Firebase · <span id="footerProject">Project: —</span></footer>
+    </main>
+  </div>
+  <div id="toast" class="toast" role="status"></div>
+  <script type="module" src="assets/admin.js"></script>
+</body></html>
