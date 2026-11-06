@@ -15,7 +15,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 provider.setCustomParameters({ prompt: 'select_account' });
-let currentUser = null, toastTimer;
+let currentUser = null, toastTimer, workerFirestoreStatus = null;
 let users = [], ents = [], subs = [], anns = [], promos = [], feedback = [], logs = [];
 
 $('ownerEmailLabel').textContent = ADMIN_EMAIL;
@@ -67,6 +67,23 @@ async function api(path, body) {
   if (!r.ok) throw new Error(data.error || `Server error ${r.status}`);
   return data;
 }
+
+async function checkWorkerFirestore() {
+  workerFirestoreStatus = null;
+  if (!API_BASE_URL || !currentUser) { workerFirestoreStatus = false; return; }
+  try {
+    const token = await currentUser.getIdToken();
+    const response = await fetch(API_BASE_URL.replace(/\/$/, '') + '/admin/firestore-check', {
+      method: 'GET', headers: { Authorization: `Bearer ${token}` }, cache: 'no-store'
+    });
+    const data = await response.json().catch(() => ({}));
+    workerFirestoreStatus = response.ok && data.ok === true && data.checks?.write === true && data.checks?.read === true && data.checks?.delete === true;
+    if (!workerFirestoreStatus) console.warn('Worker Firestore diagnostic did not pass:', response.status, data.error || '');
+  } catch (error) {
+    workerFirestoreStatus = false;
+    console.warn('Worker Firestore diagnostic request failed:', error?.message || error);
+  }
+}
 async function logAction(action, target = null, detail = null) {
   try { await addDoc(collection(db, 'adminLog'), { admin: currentUser.email, action, target, detail, createdAt: serverTimestamp() }); } catch (e) { console.warn('audit log failed', e); }
 }
@@ -76,6 +93,7 @@ async function loadAll() {
   $('connectionState').textContent = 'Loading data…'; $('connectionState').className = 'pill';
   try {
     await Promise.all([loadUsers(), loadEnts(), loadSubs(), loadAnns(), loadPromos(), loadFeedback(), loadLogs()]);
+    await checkWorkerFirestore();
     $('connectionState').textContent = 'Firebase connected'; $('connectionState').className = 'pill good';
     renderUsers(); updateStats();
   } catch (e) { $('connectionState').textContent = 'Database error'; $('connectionState').className = 'pill bad'; notify(friendlyError(e)); }
@@ -104,6 +122,7 @@ function updateStats() {
   $('statBlocked').textContent = ents.filter(e => e.blocked === true).length;
   $('setupList').innerHTML = [
     [!!API_BASE_URL, 'Halloween AI server address set (API_BASE_URL)'],
+    [workerFirestoreStatus === true, workerFirestoreStatus === true ? 'Worker Firestore read/write/delete verified' : workerFirestoreStatus === false ? 'Worker Firestore diagnostic failed (check Worker deployment and logs)' : 'Checking Worker Firestore connection…'],
     [subs.length > 0, 'At least one verified payment recorded'],
     [true, 'Entitlements are written only by the server (rules block everything else)'],
     [!!APP_CHECK_SITE_KEY, 'App Check key set for this dashboard']
