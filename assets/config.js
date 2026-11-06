@@ -17,7 +17,7 @@ export const ADMIN_EMAIL = "notxpersonalonly@gmail.com";
 
 // Halloween AI server (payments, promo codes, push, blocking). See backend/halloween-server/README.md in the app repo.
 // Example: "https://halloween-ai-server.onrender.com"
-export const API_BASE_URL = "";
+export const API_BASE_URL = "https://halloween-ai-server.notxpersonalonly.workers.dev";
 
 // Firebase App Check for this dashboard: paste the reCAPTCHA v3 SITE key (public) from Firebase Console >
 // App Check > Apps > your web app. Leave empty until you have registered it.
